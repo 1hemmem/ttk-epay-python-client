@@ -75,6 +75,7 @@ class ttk_epay:
             logger.error(f"Response body: {response.text}")
             raise
 
+    # TODO: Fix the bug here (when invoice is not found)
     def get_invoice_by_order_id(self, order_id: str):
         """
         Get details of a specific invoice by the order ID.
@@ -224,7 +225,7 @@ class ttk_epay:
     # ================
     # User
     # ================
-
+    
     # TODO: A bug here to fix
     def post_payement(self, payment_data: InvoiceDto):
         """
