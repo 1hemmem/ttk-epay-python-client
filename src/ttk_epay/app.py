@@ -167,4 +167,57 @@ class ttk_epay:
             logger.error(f"Error fetching payments: {e}")
             raise
 
-    
+    # ================
+    # File
+    # ================
+
+    def get_pdf_recipt(self, satim_order_id: str):
+        """
+        Get the PDF receipt for a specific invoice.
+
+        Args:
+            invoice_id (str): The ID of the invoice.
+
+        Returns:
+            bytes: The PDF receipt as bytes.
+        """
+        url = f"{self.base_url}/epayment/generate-pdf"
+        try:
+            response = self.session.get(url, params={"SATIM_ORDER_ID": satim_order_id})
+            response.raise_for_status()
+            return response
+        except requests.RequestException as e:
+            logger.error(
+                f"Error fetching PDF receipt for invoice with satim_order_id: {satim_order_id}: {e}"
+            )
+            raise
+
+    def send_pdf_recipt_mail(self, satim_order_id: str, email: str):
+        """
+        Send the PDF receipt to a specific email address.
+
+        Args:
+            satim_order_id (str): The ID of the invoice.
+            email (str): The email address to send the receipt to.
+
+        Returns:
+            The response from the API.
+        """
+        url = f"{self.base_url}/epayment/send-mail"
+        try:
+            response = self.session.get(
+                url, params={"SATIM_ORDER_ID": satim_order_id, "EMAIL": email}
+            )
+            response.raise_for_status()
+            content_type = response.headers.get("Content-Type")
+            if content_type == "application/json":
+                return response.json()
+            return response.text
+
+        except requests.RequestException as e:
+            logger.error(f"Response status code: {response.status_code}")
+            logger.error(
+                f"Error sending PDF receipt for invoice with satim_order_id: {satim_order_id} to {email}: {e}"
+            )
+            raise
+
