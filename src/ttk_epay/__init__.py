@@ -1,1 +1,1 @@
-from .app import TTK_EPAY
+from .app import ttk_epay

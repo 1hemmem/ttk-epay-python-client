@@ -1,6 +1,6 @@
 [tool.poetry]
-name = "ttk-epay-python-client"
-version = "0.1.0"
+name = "ttk-epay"
+version = "0.1.2"
 description = ""
 authors = ["charen bahaeddine hemmem <charenbahaeddinehemmem@gmail.com>"]
 readme = "README.md"
