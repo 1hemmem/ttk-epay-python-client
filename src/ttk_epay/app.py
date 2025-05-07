@@ -221,3 +221,45 @@ class ttk_epay:
             )
             raise
 
+    # ================
+    # User
+    # ================
+
+    # TODO: A bug here to fix
+    def post_payement(self, payment_data: InvoiceDto):
+        """
+        Post a payment to the API.
+
+        Args:
+            payment_data (InvoiceDto): Payment data object.
+
+        Returns:
+            dict: The created payment object.
+        """
+        url = f"{self.base_url}/epayment"
+        try:
+            response = self.session.post(url, json=payment_data.__dict__)
+            response.raise_for_status()
+            return response.json()
+        except requests.RequestException as e:
+            logger.error(f"Error posting payment: {e}")
+            raise
+
+    def get_payment_status(self, satim_order_id: str):
+        """
+        Get the payment status for a specific invoice.
+
+        Args:
+            satim_order_id (str): The ID of the invoice.
+
+        Returns:
+            dict: The payment status.
+        """
+        url = f"{self.base_url}/epayment"
+        try:
+            response = self.session.get(url, params={"SATIM_ORDER_ID": satim_order_id})
+            response.raise_for_status()
+            return response.json()
+        except requests.RequestException as e:
+            logger.error(f"Error fetching payment status: {e}")
+            raise
