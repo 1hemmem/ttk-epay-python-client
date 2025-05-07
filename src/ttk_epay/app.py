@@ -1,12 +1,14 @@
+# app.py
 import requests
 import logging
-from entities import Invoice
+from .models import Invoice, InvoiceDto
 
 BASE_URL = "https://pay.deploily.cloud/api/v1"
 
 # Set up logging
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
+
 
 class ttk_epay:
     """
@@ -20,9 +22,23 @@ class ttk_epay:
             {"Accept": "*/*", "Content-Type": "application/json"}
         )
 
-    def get_invoices(self, page_number: int = 1, page_size: int = 10):
+    # ===============
+    # Admin
+    # ===============
+
+    def get_invoices(self, page_number: int = 1, page_size: int = 10) -> dict:
         """
-        Fetch a list of invoices with pagination.
+        Get a paginated list of invoices from the API.
+
+        Args:
+            page_number: The page number to retrieve (1-based index). Defaults to 1.
+            page_size: The number of invoices to return per page. Defaults to 10.
+
+        Returns:
+            dict: A dictionary containing:
+                - List of Invoice objects
+                - "CURRENTPAGE": Current page number (int)
+                - "TOTALPAGES": Total pages available (int)
         """
         url = f"{self.base_url}/admin/invoices"
         params = {"pageNumber": page_number, "pageSize": page_size}
@@ -45,7 +61,7 @@ class ttk_epay:
             invoice_data (Invoice): Invoice object.
 
         Returns:
-            dict: API response as a dictionary.
+            dict (Invoice): The created Invoice object.
         """
         url = f"{self.base_url}/admin/invoices"
         try:
@@ -58,25 +74,97 @@ class ttk_epay:
             logger.error(f"Response status code: {response.status_code}")
             logger.error(f"Response body: {response.text}")
             raise
-    
-if __name__ == "__main__":
-    
-    ttk_client = ttk_epay()
 
-    # Get invoices
-    logger.info("Fetching invoices...")
-    try:
-        invoices = ttk_client.get_invoices()
-        logger.info(f"Invoices: {invoices}")
-    except Exception as e:
-        logger.error(f"Failed to fetch invoices: {e}")
+    def get_invoice_by_order_id(self, order_id: str):
+        """
+        Get details of a specific invoice by the order ID.
 
-    # Create a new invoice
-    logger.info("\nCreating new invoice...")
-    try:
-        # Create a dummy invoice with minimum required fields
-        new_invoice = Invoice(ID=1, INVOICE_NUMBER=12345, IS_PAID=False)
-        created_invoice = ttk_client.create_invoice(new_invoice)
-        logger.info(f"Created invoice: {created_invoice}")
-    except Exception as e:
-        logger.error(f"Failed to create invoice: {e}")
+        Args:
+            order_id (str): The order ID of the invoice to retrieve.
+
+        Returns:
+            dict (Invoice): The created Invoice object.
+        """
+        url = f"{self.base_url}/admin/invoices/{order_id}"
+        try:
+            response = self.session.get(url)
+            response.raise_for_status()
+            data = response.json()
+            return data
+        except requests.RequestException as e:
+            logger.error(f"Error fetching invoice with order ID {order_id}: {e}")
+            logger.error(f"HTTP error occurred: {e}")
+            logger.error(f"Response status code: {response.status_code}")
+            logger.error(f"Response body: {response.text}")
+            raise
+
+    def update_invoice(self, invoice_id: int, invoice_data: Invoice):
+        """
+        Update an invoice by ID with the provided invoice_data (as dict).
+
+        Args:
+            invoice_id (int): The ID of the invoice to update.
+            invoice_data (Invoice): Invoice object.
+
+        Returns:
+            dict (Invoice): The updated Invoice object.
+        """
+        url = f"{self.base_url}/admin/invoices/{invoice_id}"
+        try:
+            response = self.session.patch(url, json=invoice_data.__dict__)
+            response.raise_for_status()
+            return response.json()
+        except requests.RequestException as e:
+            logger.error(f"Error updating invoice with invoice ID {invoice_id}: {e}")
+            logger.error(f"HTTP error occurred: {e}")
+            logger.error(f"Response status code: {response.status_code}")
+            logger.error(f"Response body: {response.text}")
+            raise
+
+    def get_payments(
+        self,
+        page_number: int = None,
+        page_size: int = None,
+        satim_order_id: str = None,
+        invoice_id: str = None,
+        from_date: str = None,
+        to_date: str = None,
+    ):
+        """
+        Get list of payments with optional filtering parameters.
+
+        Args:
+            page_number: Page number for pagination (default: 1)
+            page_size: Number of items per page (default: 10)
+            satim_order_id: Filter by Satim order ID
+            invoice_id: Filter by invoice ID
+            from_date: Start date filter (format: 'YYYY-MM-DDTHH:MM:SSZ')
+            to_date: End date filter (format: 'YYYY-MM-DDTHH:MM:SSZ')
+
+        Returns:
+            JSON response with payments or None if error occurs
+        """
+        params = {}
+        if page_number:
+            params["pageNumber"] = page_number
+        if page_size:
+            params["pageSize"] = page_size
+        if satim_order_id:
+            params["SatimOrderId"] = satim_order_id
+        if invoice_id:
+            params["InvoiceId"] = invoice_id
+        if from_date:
+            params["FromDate"] = from_date
+        if to_date:
+            params["toDate"] = to_date
+
+        url = f"{self.base_url}/admin/payments"
+        try:
+            response = self.session.get(url, params=params)
+            response.raise_for_status()
+            return response.json()
+        except requests.RequestException as e:
+            logger.error(f"Error fetching payments: {e}")
+            raise
+
+    
