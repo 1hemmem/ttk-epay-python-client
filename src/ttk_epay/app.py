@@ -10,16 +10,21 @@ logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
 
-class ttk_epay:
+class TtkEpay:
     """
     A class to represent the ttk_epay application.
     """
 
-    def __init__(self, base_url: str = BASE_URL):
+    def __init__(self, base_url: str = BASE_URL, api_key: str = None):
+        self.api_key = api_key
         self.base_url = base_url
         self.session = requests.Session()
         self.session.headers.update(
-            {"Accept": "*/*", "Content-Type": "application/json"}
+            {
+                "Accept": "*/*",
+                "Content-Type": "application/json",
+                "Authorization": f"Bearer {self.api_key}",
+            }
         )
 
     # ===============
@@ -172,7 +177,7 @@ class ttk_epay:
     # File
     # ================
 
-    def get_pdf_recipt(self, satim_order_id: str):
+    def get_pdf_receipt(self, satim_order_id: str):
         """
         Get the PDF receipt for a specific invoice.
 
@@ -193,7 +198,7 @@ class ttk_epay:
             )
             raise
 
-    def send_pdf_recipt_mail(self, satim_order_id: str, email: str):
+    def send_pdf_receipt_mail(self, satim_order_id: str, email: str):
         """
         Send the PDF receipt to a specific email address.
 
@@ -225,9 +230,9 @@ class ttk_epay:
     # ================
     # User
     # ================
-    
+
     # TODO: A bug here to fix
-    def post_payement(self, payment_data: InvoiceDto):
+    def create_payement(self, payment_data: InvoiceDto):
         """
         Post a payment to the API.
 

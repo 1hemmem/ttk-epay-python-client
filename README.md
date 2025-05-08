@@ -15,11 +15,11 @@ pip install ttk-epay
 
 ## Usage
 ```python
-from ttk_epay import ttk_epay
+from ttk_epay import TtkEpay
 from ttk_epay.models import Invoice, InvoiceDto
 
 # Initialize the client
-client = ttk_epay(base_url="https://pay.deploily.cloud/api/v1")
+client = TtkEpay(base_url="https://pay.deploily.cloud/api/v1")
 
 # ==============
 # Invoice Management
