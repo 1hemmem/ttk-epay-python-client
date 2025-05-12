@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 # models.py
 class Invoice:
     def __init__(

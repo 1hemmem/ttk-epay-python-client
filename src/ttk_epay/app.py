@@ -1,9 +1,9 @@
+# -*- coding: utf-8 -*-
 # app.py
 import requests
 import logging
 from .models import Invoice, InvoiceDto
-
-BASE_URL = "https://pay.deploily.cloud/api/v1"
+from .settings import BASE_URL
 
 # Set up logging
 logging.basicConfig(level=logging.INFO)
