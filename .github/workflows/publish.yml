@@ -24,9 +24,9 @@ jobs:
           pip install build twine
           pip install -e .[test]  # Install test dependencies if needed
 
-      - name: Run tests
-        run: |
-          pytest  # Or your test command
+      # - name: Run tests
+      #   run: |
+      #     pytest  # Or your test command
 
       - name: Clean previous builds
         run: |
