@@ -1,32 +1,39 @@
-name: Publish to PyPI on main push
+name: Publish to PyPI on main
 
 on:
   push:
     branches:
       - main
 
+permissions:
+  id-token: write    # 🔐 Required for OIDC (Trusted Publishing)
+  contents: read     # 📦 Required to read repo contents
+
+env:
+  PYTHON_VERSION: "3.11"
+  PACKAGE_DIR: "."   # Change if your pyproject.toml or setup.py is in a subdir
+
 jobs:
   build-and-publish:
     runs-on: ubuntu-latest
+
     steps:
-      - name: Check out code
+      - name: Checkout repository
         uses: actions/checkout@v4
 
       - name: Set up Python
         uses: actions/setup-python@v5
         with:
-          python-version: '3.11'
+          python-version: ${{ env.PYTHON_VERSION }}
 
       - name: Install build dependencies
         run: |
           python -m pip install --upgrade pip
-          pip install build twine
+          pip install build
 
       - name: Build the package
-        run: python -m build
+        run: |
+          python -m build ${{ env.PACKAGE_DIR }}
 
-      - name: Publish to PyPI using API Token
-        run: twine upload dist/*
-        env:
-          username: __token__
-          password: ${{ secrets.PYPI_SECRET_TOKEN }}
+      - name: Publish to PyPI
+        uses: pypa/gh-action-pypi-publish@release/v1
