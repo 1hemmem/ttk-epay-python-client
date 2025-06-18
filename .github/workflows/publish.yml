@@ -32,6 +32,6 @@ jobs:
       - name: Publish package to PyPI
         env:
           TWINE_USERNAME: __token__
-          TWINE_PASSWORD: ${{ vars.PYPI_API_TOKEN }}  # 👈 Uses environment variable
+          TWINE_PASSWORD: ${{ pypi.PYPI_API_TOKEN }}  # 👈 Uses environment variable
         run: |
           twine upload dist/*
