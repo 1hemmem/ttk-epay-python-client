@@ -8,6 +8,9 @@ on:
 jobs:
   build-and-publish:
     runs-on: ubuntu-latest
+    permissions:
+      id-token: write  # Required for OIDC/OAuth token authentication
+      contents: read   # Required to checkout the code
 
     steps:
       - name: Check out code
@@ -18,25 +21,13 @@ jobs:
         with:
           python-version: '3.11'
 
-      - name: Install dependencies
+      - name: Install build dependencies
         run: |
           python -m pip install --upgrade pip
-          pip install build twine
-          pip install -e .[test]  # Install test dependencies if needed
-
-      # - name: Run tests
-      #   run: |
-      #     pytest  # Or your test command
-
-      - name: Clean previous builds
-        run: |
-          rm -rf dist/* || true
+          pip install build
 
       - name: Build the package
         run: python -m build
 
-      - name: Publish to PyPI
+      - name: Publish to PyPI using Trusted Publishing
         uses: pypa/gh-action-pypi-publish@release/v1
-        with:
-          user: __token__
-          password: ${{ secrets.PYPI_SECRET_TOKEN }}
