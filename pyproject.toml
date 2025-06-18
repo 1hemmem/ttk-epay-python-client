@@ -1,5 +1,5 @@
 [tool.poetry]
-name = "test-ttk-epay"
+name = "ttk-epay"
 version = "0.1.6"
 description = ""
 authors = ["charen bahaeddine hemmem <charenbahaeddinehemmem@gmail.com>"]
