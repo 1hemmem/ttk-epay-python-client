@@ -10,7 +10,7 @@ jobs:
     runs-on: ubuntu-latest
     permissions:
       id-token: write  # IMPORTANT: mandatory for trusted publishing
-      
+
     steps:
       - name: Check out code
         uses: actions/checkout@v4
@@ -31,5 +31,5 @@ jobs:
       - name: Publish to PyPI using API Token
         run: twine upload dist/*
         env:
-          TWINE_USERNAME: __token__
-          TWINE_PASSWORD: ${{ secrets.PYPI_SECRET_TOKEN }}
+          username: __token__
+          password: ${{ secrets.PYPI_SECRET_TOKEN }}
