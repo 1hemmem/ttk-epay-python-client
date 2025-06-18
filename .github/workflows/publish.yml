@@ -1,32 +1,37 @@
-name: Publish to PyPI on main push
+name: Publish Python Package to PyPI
 
 on:
+  release:
+    types: [created]
   push:
-    branches:
-      - main  # Trigger when pushing to main
+    branches: [main]
 
 jobs:
   build-and-publish:
+    name: Build and publish Python package
     runs-on: ubuntu-latest
+    environment: production  # 👈 Required if your variable is scoped to this environment
 
     steps:
-      - name: Check out code
+      - name: Checkout code
         uses: actions/checkout@v4
 
       - name: Set up Python
         uses: actions/setup-python@v5
         with:
-          python-version: '3.11'  # Or your preferred version
+          python-version: '3.11'
 
-      - name: Install build dependencies
+      - name: Install build tools
         run: |
           python -m pip install --upgrade pip
-          pip install build
+          pip install build twine
 
-      - name: Build the package
+      - name: Build package
         run: python -m build
 
-      - name: Publish to PyPI
-        uses: pypa/gh-action-pypi-publish@release/v1
-        with:
-          password: ${{ secrets.PYPI_SECRET_TOKEN }}
+      - name: Publish package to PyPI
+        env:
+          TWINE_USERNAME: __token__
+          TWINE_PASSWORD: ${{ vars.PYPI_API_TOKEN }}  # 👈 Uses environment variable
+        run: |
+          twine upload dist/*
